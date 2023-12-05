@@ -15,4 +15,4 @@ jobs:
           secrets: |
             secret/data/ci app_secret
       - name: Build Docker Image
-        run: docker build . --file Dockerfile --build-arg app_secret="${{ env.APP_SECRET }}" -t vault-action-example
+        run: docker build . --file tutorial-3/Dockerfile --build-arg app_secret="${{ env.APP_SECRET }}" -t vault-action-example
