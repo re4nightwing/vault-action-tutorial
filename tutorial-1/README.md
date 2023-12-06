@@ -66,5 +66,5 @@ APPROLE_ROLE_NAME = 'my-role'
 
 3. Run the application
 ```bash
-python main.py
+python kv_vault.py
 ```
