@@ -1,3 +1,5 @@
+# Tutorial 03 (Using vault with github actions)
+
 ## 1. Get needed files
 ```bash
 git clone https://github.com/hashicorp-education/learn-vault-github-actions.git
@@ -5,7 +7,8 @@ cd learn-vault-github-actions/vault-github-action
 ```
 
 ## 2. Create Docker image
-```tree
+
+```bash
 .
 ├── config.ru
 ├── Dockerfile
@@ -13,6 +16,7 @@ cd learn-vault-github-actions/vault-github-action
 └── lib
     └── service.rb
 ```
+
 Dockerfile
 ```docker
 FROM ruby:3.0
@@ -48,22 +52,26 @@ CMD ["rackup", "--port", "8080", "--env", "production" ]
 ```bash
 docker build . --file tutorial-3/Dockerfile -t vault-action-example --network=host
 ```
+
 - check current secret key
 ```bash
 docker run vault-action-example /bin/bash -c "cat ./app_secret"
 ```
 
 ## 3. Start vault (dev mode)
+
 ```bash
 vault server -dev -dev-root-token-id=root
 export VAULT_ADDR=http://127.0.0.1:8200
 export VAULT_TOKEN=root
 ```
+
 - create a secret in vault
 ```bash
 vault kv put secret/ci app_secret=SecretProvidedByVault
 vault kv get secret/ci
 ```
+
 - create a policy with read access to the secret path
 ```bash
 vault policy write ci-secret-reader - <<EOF
@@ -72,10 +80,12 @@ path "secret/data/ci" {
 }
 EOF
 ```
+
 - Export an environment variable GITHUB_REPO_TOKEN to capture the token value created with the ci-secret-reader policy attached.
 ```bash
 GITHUB_REPO_TOKEN=$(vault token create -policy=ci-secret-reader -format json | jq -r ".auth.client_token")
 ```
+
 - Retrieve the secret at the path using the GITHUB_REPO_TOKEN.(check if the token is working)
 ```bash
 VAULT_TOKEN=$GITHUB_REPO_TOKEN vault kv get secret/ci
@@ -84,22 +94,26 @@ VAULT_TOKEN=$GITHUB_REPO_TOKEN vault kv get secret/ci
 **Add all files to a github repo.**
 
 ## 4. Setup auth credential in gihub repo secrets
+
 1. Go to repository settings
 2. Go to secrets and variables > actions
 3. Create a new Repository secrets as `VAULT_TOKEN`. (VAULT_TOKEN should be the $GITHUB_REPO_TOKEN varibale created using the policy)
 
 ## 5. Setup the GitHub self-hosted runner
+
 1. Go to repository settings
 2. Go to Actions>Runners
 3. Click on "New self-hosted runner" and follow the instructions to create a new runner.
 
 ## 6. Create github workflow for the actions
+
 1. In local repo location create the workflow directory.
-```
+```bash
 mkdir -p .github/workflows
 ```
+
 .github/workflows/image-builder.yml
-```yaml
+```yml
 name: ImageBuilder
 # Run this workflow every time a new commit pushed to your repository
 on: push
@@ -121,9 +135,10 @@ jobs:
 ```
 
 ## 7. Finally
+
 1. Push the repo changes to the remote to trigger the action workflow.
 2. Check the local runner or github actions tab for process status.
 3. Check the secret change using,
-```
+```bash
 docker run vault-action-example /bin/bash -c "cat ./app_secret"
 ```
