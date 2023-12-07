@@ -53,19 +53,19 @@ if __name__ == "__main__":
     if login_with_approle(APPROLE_ROLE_NAME):
         print("=================")
         secret_path = 'kitty/hello'
-        secret_data = {'username': 'new', 'password': 'life2'}
+        secret_data = {'username': 'hello', 'password': 'world'}
 
         # Write a secret
         #write_secret(secret_path, secret_data)
         #print(f"Secret written to {secret_path}")
 
         # Patch a secret
-        #patch_secret(secret_path, secret_data)
-        #print(f"Secret Patched to {secret_path}")
+        patch_secret(secret_path, secret_data)
+        print(f"Secret Patched to {secret_path}")
 
         # Read a secret
-        #retrieved_secret = read_secret(secret_path)
-        #print(f"Retrieved Secret: {retrieved_secret}")
+        retrieved_secret = read_secret(secret_path)
+        print(f"Retrieved Secret: {retrieved_secret}")
 
         # List all secrets in a path
         all_secrets = list_secrets("kitty")
